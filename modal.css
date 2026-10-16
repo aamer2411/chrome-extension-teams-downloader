@@ -1,0 +1,660 @@
+/* ============================================================================
+   Theme tokens: single source of truth for both modes.
+   Dark mode overrides at the bottom via @media (prefers-color-scheme: dark).
+   ============================================================================ */
+:root {
+  --ttd-bg:            #ffffff;
+  --ttd-bg-subtle:     #f3f3f5;
+  --ttd-bg-hover:      #e9e9ed;
+  --ttd-bg-backdrop:   rgba(0, 0, 0, 0.45);
+  --ttd-bg-error:      #fdeeee;
+
+  --ttd-text:          #242424;
+  --ttd-text-muted:    #616161;
+  --ttd-text-dim:      #8a8a8a;
+
+  --ttd-border:        #e3e3e6;
+  --ttd-border-strong: #d1d1d6;
+
+  --ttd-accent:        #5b5fc7;
+  --ttd-accent-hover:  #4f52b2;
+  --ttd-danger:        #c4314b;
+  --ttd-success:       #2e8b57;
+
+  --ttd-shadow:        0 8px 32px rgba(0, 0, 0, 0.22);
+}
+
+/* ============================================================================
+   Shared dialog shell (transcript options + video download)
+   ============================================================================ */
+#formatSelectionModal,
+#videoDownloadModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--ttd-bg-backdrop);
+  z-index: 2147483640;
+  justify-content: center;
+  align-items: center;
+}
+
+#formatSelectionModal.show,
+#videoDownloadModal.show {
+  display: flex;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-content {
+  box-sizing: border-box;
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 18px 20px;
+  background: var(--ttd-bg);
+  border: 1px solid var(--ttd-border);
+  border-radius: 10px;
+  box-shadow: var(--ttd-shadow);
+  color: var(--ttd-text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) :is(button, input, select) {
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ttd-text);
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-close {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ttd-text-muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-close:hover {
+  background: var(--ttd-bg-subtle);
+  color: var(--ttd-text);
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .ttd-field {
+  margin-bottom: 14px;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .ttd-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ttd-text-muted);
+}
+
+/* Segmented choice: transcript format and video format */
+:is(#formatSelectionModal, #videoDownloadModal) :is(.format-options-container, .video-format-cards) {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  padding: 3px;
+  background: var(--ttd-bg-subtle);
+  border-radius: 8px;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) :is(.format-option, .video-format-card) {
+  margin: 0;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ttd-text-muted);
+  font-size: 13px;
+  font-weight: 400;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) :is(.format-option, .video-format-card):hover {
+  color: var(--ttd-text);
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) :is(.format-option, .video-format-card).selected {
+  background: var(--ttd-bg);
+  color: var(--ttd-text);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .format-badge {
+  margin-left: 2px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ttd-text-dim);
+}
+
+#formatSelectionModal .format-hint {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--ttd-text-muted);
+}
+
+#formatSelectionModal .format-sample {
+  max-height: 110px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  background: var(--ttd-bg-subtle);
+  border-radius: 6px;
+  color: var(--ttd-text);
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Portion slider: two range inputs laid over one rail. Only the handles take
+   pointer events so both stay draggable. */
+#formatSelectionModal .ttd-range {
+  position: relative;
+  height: 20px;
+}
+
+#formatSelectionModal .ttd-range-rail {
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  top: 8px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ttd-border-strong);
+}
+
+#formatSelectionModal .ttd-range-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 2px;
+  background: var(--ttd-accent);
+}
+
+#formatSelectionModal .ttd-range input[type="range"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#formatSelectionModal .ttd-range input[type="range"]::-webkit-slider-runnable-track {
+  height: 20px;
+  background: transparent;
+}
+
+#formatSelectionModal .ttd-range input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+  border: 2px solid var(--ttd-accent);
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+#formatSelectionModal .ttd-range-times {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ttd-text);
+}
+
+#formatSelectionModal .ttd-range-context {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--ttd-text-muted);
+}
+
+#formatSelectionModal .ttd-range-context div {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#formatSelectionModal .ttd-range-tag {
+  display: inline-block;
+  width: 42px;
+  color: var(--ttd-text-dim);
+}
+
+/* File name row */
+:is(#formatSelectionModal, #videoDownloadModal) .filename-input-container {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 8px;
+  background: var(--ttd-bg);
+  border: 1px solid var(--ttd-border-strong);
+  border-radius: 6px;
+  transition: border-color 0.12s ease;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .filename-input-container:focus-within {
+  border-color: var(--ttd-accent);
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .filename-input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--ttd-text);
+  font-size: 13px;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .filename-input.error {
+  background: var(--ttd-bg-error);
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .filename-input::placeholder {
+  color: var(--ttd-text-dim);
+}
+
+#formatSelectionModal .filename-suffix,
+#formatSelectionModal .filename-extension {
+  color: var(--ttd-text-dim);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+#formatSelectionModal .filename-extension {
+  user-select: none;
+}
+
+/* The suffix is an editable input styled to read as static text so the row still looks like one filename
+   The dashed underline on hover/focus is the only hint that it can be typed into. */
+#formatSelectionModal .filename-suffix {
+  flex: 0 0 auto;
+  border: none;
+  border-bottom: 1px dashed transparent;
+  outline: none;
+  padding: 0;
+  background: transparent;
+  cursor: text;
+  transition: border-bottom-color 0.2s ease, color 0.2s ease;
+}
+
+#formatSelectionModal .filename-suffix:hover,
+#formatSelectionModal .filename-suffix:focus {
+  color: var(--ttd-text);
+  border-bottom-color: var(--ttd-text-dim);
+}
+
+#formatSelectionModal .filename-suffix-reset {
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ttd-text-dim);
+  font-size: 13px;
+  line-height: 1;
+  padding: 3px 5px;
+  cursor: pointer;
+}
+
+#formatSelectionModal .filename-suffix-reset:hover {
+  color: var(--ttd-accent);
+  background: var(--ttd-bg-subtle);
+}
+
+/* Explicit bcz the class above sets a display-affecting box model
+   The [hidden] attribute alone would lose to it */
+#formatSelectionModal .filename-suffix-reset[hidden] {
+  display: none;
+}
+
+/* Footer */
+:is(#formatSelectionModal, #videoDownloadModal) .modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-note {
+  font-size: 12px;
+  color: var(--ttd-text-dim);
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-actions-buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-button {
+  padding: 6px 14px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-button-cancel {
+  background: transparent;
+  border-color: var(--ttd-border-strong);
+  color: var(--ttd-text);
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-button-cancel:hover {
+  background: var(--ttd-bg-subtle);
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-button-download {
+  background: var(--ttd-accent);
+  color: #ffffff;
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-button-download:hover {
+  background: var(--ttd-accent-hover);
+}
+
+:is(#formatSelectionModal, #videoDownloadModal) .modal-button-download:disabled {
+  background: var(--ttd-bg-hover);
+  color: var(--ttd-text-dim);
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   Options arrow next to the in-page Download Transcript button
+   ============================================================================ */
+.ttd-tx {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  margin: 0 4px !important;
+  vertical-align: middle !important;
+}
+
+.ttd-tx-btn,
+.ttd-caret {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: #5b5fc7 !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+}
+
+.ttd-tx-btn {
+  width: 28px !important;
+  border-radius: 4px 0 0 4px !important;
+}
+
+.ttd-caret {
+  width: 18px !important;
+  margin-left: 1px !important;
+  border-radius: 0 4px 4px 0 !important;
+}
+
+.ttd-tx-btn:hover,
+.ttd-caret:hover {
+  background: #4f52b2 !important;
+}
+
+.ttd-tx-btn svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.ttd-caret svg {
+  display: block;
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+/* ============================================================================
+   Video Download Modal
+   ============================================================================ */
+#videoDownloadModal .browser-dl-action-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: var(--ttd-accent);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+#videoDownloadModal .browser-dl-action-btn:hover {
+  background: var(--ttd-accent-hover);
+}
+
+#videoDownloadModal .browser-dl-action-btn:disabled {
+  background: var(--ttd-bg-hover);
+  color: var(--ttd-text-dim);
+  cursor: not-allowed;
+}
+
+#videoDownloadModal .browser-dl-action-btn.browser-dl-cancelling {
+  background: var(--ttd-danger);
+}
+
+#videoDownloadModal .browser-download-section {
+  margin-bottom: 12px;
+}
+
+#videoDownloadModal .browser-dl-progress-bar-wrap {
+  height: 4px;
+  margin-bottom: 6px;
+  background: var(--ttd-border-strong);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+#videoDownloadModal .browser-dl-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--ttd-accent);
+  border-radius: 2px;
+  transition: width 0.2s ease;
+}
+
+#videoDownloadModal .browser-dl-progress-bar.browser-dl-complete {
+  background: var(--ttd-success);
+}
+
+#videoDownloadModal .browser-dl-progress-bar.browser-dl-error {
+  background: var(--ttd-danger);
+}
+
+#videoDownloadModal .browser-dl-status {
+  min-height: 18px;
+  font-size: 12px;
+  color: var(--ttd-text-muted);
+}
+
+#videoDownloadModal .video-parallel-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--ttd-text-dim);
+}
+
+#videoDownloadModal .video-parallel-label {
+  color: var(--ttd-text-muted);
+}
+
+#videoDownloadModal .video-parallel-select {
+  padding: 3px 6px;
+  border: 1px solid var(--ttd-border-strong);
+  border-radius: 6px;
+  background: var(--ttd-bg);
+  color: var(--ttd-text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#videoDownloadModal .video-parallel-hint {
+  flex-basis: 100%;
+}
+
+/* ============================================================================
+   Warning dialogs: DRM-protected video, and no transcript found
+   ============================================================================ */
+#ttdDrmWarningOverlay,
+#ttdNoTranscriptOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--ttd-bg-backdrop);
+  z-index: 2147483645;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+#ttdDrmWarningOverlay.show,
+#ttdNoTranscriptOverlay.show {
+  display: flex;
+}
+
+#ttdDrmWarningOverlay .ttd-drm-dialog,
+#ttdNoTranscriptOverlay .ttd-info-dialog {
+  box-sizing: border-box;
+  width: min(440px, 100%);
+  padding: 18px 20px;
+  background: var(--ttd-bg);
+  border: 1px solid var(--ttd-border);
+  border-radius: 10px;
+  box-shadow: var(--ttd-shadow);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  text-align: left;
+}
+
+#ttdDrmWarningOverlay .ttd-drm-icon,
+#ttdNoTranscriptOverlay .ttd-info-icon {
+  display: none;
+}
+
+:is(#ttdDrmWarningOverlay, #ttdNoTranscriptOverlay) h2 {
+  margin: 0 0 10px;
+  color: var(--ttd-text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+:is(#ttdDrmWarningOverlay, #ttdNoTranscriptOverlay) p {
+  margin: 0 0 10px;
+  color: var(--ttd-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+:is(#ttdDrmWarningOverlay, #ttdNoTranscriptOverlay) p strong {
+  color: var(--ttd-text);
+}
+
+#ttdDrmWarningOverlay .ttd-drm-actions,
+#ttdNoTranscriptOverlay .ttd-info-actions {
+  margin-top: 14px;
+  text-align: right;
+}
+
+:is(#ttdDrmWarningOverlay, #ttdNoTranscriptOverlay) button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  background: var(--ttd-accent);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+:is(#ttdDrmWarningOverlay, #ttdNoTranscriptOverlay) button:hover {
+  background: var(--ttd-accent-hover);
+}
+
+/* ============================================================================
+   Dark mode: follows the OS / browser preference.
+   ============================================================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ttd-bg:            #242428;
+    --ttd-bg-subtle:     #18181b;
+    --ttd-bg-hover:      #34343a;
+    --ttd-bg-backdrop:   rgba(0, 0, 0, 0.6);
+    --ttd-bg-error:      #3a1c1c;
+
+    --ttd-text:          #ececef;
+    --ttd-text-muted:    #adadb4;
+    --ttd-text-dim:      #85858d;
+
+    --ttd-border:        #34343a;
+    --ttd-border-strong: #45454d;
+
+    --ttd-accent:        #6d71d8;
+    --ttd-accent-hover:  #7f83e6;
+
+    --ttd-shadow:        0 12px 44px rgba(0, 0, 0, 0.6);
+  }
+
+  :is(#formatSelectionModal, #videoDownloadModal) :is(.format-option, .video-format-card).selected {
+    background: var(--ttd-bg-hover);
+  }
+}

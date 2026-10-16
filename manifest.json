@@ -1,0 +1,77 @@
+{
+   "action": {
+      "default_icon": {
+         "128": "icons/icon128.png"
+      }
+   },
+   "author": "Mohammed Aamer",
+   "content_scripts": [
+      {
+         "all_frames": true,
+         "js": [
+            "intercept.js"
+         ],
+         "matches": [
+            "https://*.sharepoint.com/*",
+            "https://*.sharepoint.com.mcas.ms/*",
+            "https://teams.microsoft.com/*",
+            "https://teams.cloud.microsoft/*",
+            "https://teams.microsoft.com.mcas.ms/*"
+         ],
+         "run_at": "document_start",
+         "world": "MAIN"
+      },
+      {
+         "all_frames": true,
+         "css": [
+            "modal.css"
+         ],
+         "js": [
+            "content.js"
+         ],
+         "matches": [
+            "https://*.sharepoint.com/*",
+            "https://*.sharepoint.com.mcas.ms/*",
+            "https://teams.microsoft.com/*",
+            "https://teams.cloud.microsoft/*",
+            "https://teams.microsoft.com.mcas.ms/*"
+         ],
+         "run_at": "document_idle"
+      }
+   ],
+   "description": "Download MS Teams meeting videos and transcripts. Multiple formats (JSON, VTT, Grouped). In-browser.",
+   "homepage_url": "https://github.com/aamer2411/chrome-extension-teams-downloader",
+   "host_permissions": [
+      "https://*.sharepoint.com/*",
+      "https://*.sharepoint.com.mcas.ms/*",
+      "https://*.svc.ms/*",
+      "https://teams.microsoft.com/*",
+      "https://teams.cloud.microsoft/*",
+      "https://teams.microsoft.com.mcas.ms/*"
+   ],
+   "icons": {
+      "128": "icons/icon128.png"
+   },
+   "manifest_version": 3,
+   "name": "Teams Downloader",
+   "permissions": [
+      "storage"
+   ],
+   "short_name": "Teams Downloader",
+   "version": "1.6.1",
+   "web_accessible_resources": [
+      {
+         "matches": [
+            "https://*.sharepoint.com/*",
+            "https://*.sharepoint.com.mcas.ms/*",
+            "https://teams.microsoft.com/*",
+            "https://teams.cloud.microsoft/*",
+            "https://teams.microsoft.com.mcas.ms/*"
+         ],
+         "resources": [
+            "intercept.js",
+            "mux-worker.js"
+         ]
+      }
+   ]
+}
